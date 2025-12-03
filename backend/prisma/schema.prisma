@@ -1,0 +1,40 @@
+// Prisma schema for grocery labeler dataset
+// Run `npx prisma generate` to generate client
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LabelSource {
+  AUTO
+  MANUAL
+  AUTO_CORRECTED
+}
+
+model Image {
+  id              Int          @id @default(autoincrement())
+  filePath        String
+  createdAt       DateTime     @default(now())
+  uploadedByUserId Int? // optional for future auth
+  labels          ImageLabel[]
+}
+
+model ImageLabel {
+  id         Int         @id @default(autoincrement())
+  image      Image       @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  imageId    Int
+  name       String
+  category   String?
+  confidence Float?
+  source     LabelSource
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([imageId])
+  @@index([name])
+}
