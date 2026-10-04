@@ -1,1 +1,15 @@
-Readme
+# Stride
+
+A responsive personal marathon-training dashboard designed around Garmin activity files stored in Google Drive. The prototype provides weekly mileage and training-load summaries, race-readiness projections, activity drill-downs, and a suggested weekly plan.
+
+## Run locally
+
+```bash
+npm start
+```
+
+Then open <http://localhost:4173> **on the same computer that is running the command**.
+
+When running in a hosted coding workspace, expose port `4173` in the workspace's **Ports** or **Preview** panel and open the generated HTTPS URL. Opening `localhost:4173` in Safari on a different computer or phone will not reach the workspace server.
+
+The server listens on `0.0.0.0` so workspace port forwarding can reach it. The current Google Drive sync is an interactive prototype and uses representative activity data; production Drive authorization and FIT/TCX parsing can be connected to the sync action later.
