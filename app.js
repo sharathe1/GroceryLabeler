@@ -1,0 +1,38 @@
+const activities = [
+  {name:'Sunday long run',date:'Today · 7:04 AM',distance:'18.4 km',pace:'5:37 /km',time:'1:43:22',type:'Long run',load:'High',note:'Excellent endurance work. You held a steady effort through the final 5 km, a strong signal that your aerobic base is building.'},
+  {name:'Tempo intervals',date:'Fri, Oct 2 · 6:18 AM',distance:'11.2 km',pace:'4:58 /km',time:'55:41',type:'Tempo run',load:'High',note:'Your pace was controlled and consistent across all four intervals. Recovery between efforts is improving.'},
+  {name:'Morning easy run',date:'Wed, Sep 30 · 6:42 AM',distance:'8.1 km',pace:'5:49 /km',time:'47:12',type:'Easy run',load:'Low',note:'A well-executed recovery run. Heart-rate effort stayed easy and supported the rest of your training week.'},
+  {name:'Hill repeats',date:'Tue, Sep 29 · 6:09 AM',distance:'8.5 km',pace:'5:16 /km',time:'44:45',type:'Intervals',load:'Medium',note:'Strong form across the climbing repetitions. Your power stayed consistent without overreaching.'},
+  {name:'Riverside recovery',date:'Sun, Sep 27 · 8:20 AM',distance:'6.4 km',pace:'6:02 /km',time:'38:36',type:'Easy run',load:'Low',note:'You kept the effort light after a demanding week. This is exactly the recovery stimulus your plan called for.'},
+  {name:'Progression long run',date:'Sat, Sep 26 · 7:12 AM',distance:'21.1 km',pace:'5:32 /km',time:'1:56:45',type:'Long run',load:'High',note:'A confident half-marathon distance with a controlled negative split. Fueling and pacing were both on target.'}
+];
+const weeks=[{label:'Aug 17',actual:31,goal:36},{label:'Aug 24',actual:37,goal:40},{label:'Aug 31',actual:34,goal:42},{label:'Sep 7',actual:43,goal:45},{label:'Sep 14',actual:39,goal:48},{label:'Sep 21',actual:51,goal:50},{label:'Sep 28',actual:47,goal:52},{label:'Oct 5',actual:46.2,goal:55,current:true}];
+const plan=[
+  {day:'MON',date:'05',name:'Easy run',detail:'8 km · Relaxed',duration:'45–50 min',icon:'↗'},
+  {day:'TUE',date:'06',name:'Recovery',detail:'Mobility + core',duration:'25 min',icon:'◌'},
+  {day:'WED',date:'07',name:'Easy run',detail:'10 km · Aerobic',duration:'55–60 min',icon:'↗'},
+  {day:'THU',date:'08',name:'Tempo',detail:'3 × 2 km · Threshold',duration:'70 min',icon:'⚡'},
+  {day:'FRI',date:'09',name:'Rest day',detail:'Full recovery',duration:'Sleep 8+ hrs',icon:'☾',rest:true},
+  {day:'SAT',date:'10',name:'Shakeout',detail:'6 km · Very easy',duration:'35 min',icon:'↗'},
+  {day:'SUN',date:'11',name:'Long run',detail:'22 km · Steady',duration:'2 hrs 5 min',icon:'↗',today:true}
+];
+const barChart=document.querySelector('#barChart');
+weeks.forEach(w=>{const group=document.createElement('div');group.className='bar-group';group.innerHTML=`<div class="bar goal" style="height:${w.goal/60*165}px"></div><div class="bar actual ${w.current?'current':''}" style="height:${w.actual/60*165}px"></div><label>${w.label}</label>`;barChart.appendChild(group)});
+function activityMarkup(a){return `<div class="activity-item" data-name="${a.name}"><div class="activity-icon">↗</div><div class="activity-name"><strong>${a.name}</strong><span>${a.date}</span></div><div class="activity-metric"><strong>${a.distance}</strong><span>DISTANCE</span></div><div class="activity-metric"><strong>${a.pace}</strong><span>AVG. PACE</span></div><div class="activity-metric"><strong>${a.time}</strong><span>TIME</span></div><span class="chev">›</span></div>`}
+document.querySelector('#activityList').innerHTML=activities.slice(0,3).map(activityMarkup).join('');
+function renderTable(filter=''){const filtered=activities.filter(a=>a.name.toLowerCase().includes(filter.toLowerCase()));document.querySelector('#activityTable').innerHTML=`<div class="table-row header"><span>Activity</span><span>Distance</span><span>Pace</span><span>Time</span><span>Load</span></div>`+filtered.map(a=>`<div class="table-row" data-name="${a.name}"><strong>${a.name}<small style="display:block;color:#8a9690;font-weight:400;margin-top:3px">${a.date}</small></strong><span>${a.distance}</span><span>${a.pace}</span><span>${a.time}</span><span>${a.load}</span></div>`).join('');bindActivities()}
+renderTable();
+document.querySelector('#planGrid').innerHTML=plan.map(d=>`<article class="day-card ${d.rest?'rest':''} ${d.today?'today':''}"><span class="day">${d.day}</span><div class="date">${d.date}</div><div class="workout-type">${d.icon}</div><h3>${d.name}</h3><p>${d.detail}</p><span class="duration">${d.duration}</span></article>`).join('');
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.view===id));scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
+document.querySelectorAll('[data-view-link]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.viewLink)));
+const modal=document.querySelector('#activityModal');
+function openActivity(name){const a=activities.find(x=>x.name===name);if(!a)return;document.querySelector('#modalDate').textContent=a.date.toUpperCase();document.querySelector('#modalTitle').textContent=a.name;document.querySelector('#modalSub').textContent=`${a.type} · Garmin activity`;document.querySelector('#modalStats').innerHTML=`<div><span>DISTANCE</span><strong>${a.distance}</strong></div><div><span>AVG. PACE</span><strong>${a.pace}</strong></div><div><span>TIME</span><strong>${a.time}</strong></div>`;document.querySelector('#modalNote').textContent=a.note;modal.classList.add('open');modal.setAttribute('aria-hidden','false')}
+function bindActivities(){document.querySelectorAll('[data-name]').forEach(row=>row.onclick=()=>openActivity(row.dataset.name))}bindActivities();
+document.querySelector('.modal-close').onclick=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true')};modal.onclick=e=>{if(e.target===modal)document.querySelector('.modal-close').click()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelector('.modal-close').click()});
+function sync(button){button.classList.add('loading');button.querySelector('span')&&(button.querySelector('span').textContent='Analyzing…');setTimeout(()=>{button.classList.remove('loading');button.querySelector('span')&&(button.querySelector('span').textContent='Sync activities');document.querySelector('#syncStatus').textContent='Google Drive · Synced just now';const toast=document.querySelector('#toast');toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3200)},1300)}
+document.querySelector('#syncButton').onclick=e=>sync(e.currentTarget);document.querySelector('#syncButtonTwo').onclick=e=>sync(e.currentTarget);
+document.querySelector('#workoutButton').onclick=()=>showView('plan');
+document.querySelector('#activitySearch').addEventListener('input',e=>renderTable(e.target.value));
+document.querySelector('#activityFilter').addEventListener('change',e=>{const val=e.target.value;const match=val==='All runs'?'':val.replace(' runs','').replace(' run','').toLowerCase();document.querySelector('#activityTable').innerHTML=`<div class="table-row header"><span>Activity</span><span>Distance</span><span>Pace</span><span>Time</span><span>Load</span></div>`+activities.filter(a=>!match||a.type.toLowerCase().includes(match)).map(a=>`<div class="table-row" data-name="${a.name}"><strong>${a.name}<small style="display:block;color:#8a9690;font-weight:400;margin-top:3px">${a.date}</small></strong><span>${a.distance}</span><span>${a.pace}</span><span>${a.time}</span><span>${a.load}</span></div>`).join('');bindActivities()});

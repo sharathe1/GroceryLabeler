@@ -1,0 +1,10 @@
+{
+  "name": "stride-marathon-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A personal marathon training dashboard for Garmin activity analysis.",
+  "scripts": {
+    "start": "python3 serve.py",
+    "test": "node --check app.js"
+  }
+}
